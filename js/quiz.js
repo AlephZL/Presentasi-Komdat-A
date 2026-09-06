@@ -578,9 +578,9 @@ function renderPreMissionBriefing() {
         </div>
       </div>
 
-      <!-- Big Start Action Button -->
+      <!-- Solid Cyber Start Button (No Gradient) -->
       <div class="pt-2">
-        <button onclick="startMissionFromBriefing()" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-cyan-600 via-indigo-600 to-emerald-600 hover:from-cyan-500 hover:to-emerald-500 text-white font-extrabold text-sm transition-all shadow-xl shadow-indigo-600/30 cursor-pointer flex items-center justify-center gap-2 mx-auto active:scale-95">
+        <button onclick="startMissionFromBriefing()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 border border-emerald-400/50 text-white font-mono font-bold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg shadow-emerald-950/60 cursor-pointer flex items-center justify-center gap-2.5 mx-auto active:scale-95">
           <i data-lucide="play" class="w-4 h-4 fill-white"></i> MULAI OPERASI CYBER CTF SEKARANG
         </button>
       </div>
@@ -1621,21 +1621,21 @@ function showFinalScoreboard() {
 
   let rank = '🎖️ CYBER ARCHITECT ELITE';
   let rankDesc = 'Luar biasa! Anda menembus 10 tahapan operasional komunikasi data dengan kecakapan dan kecepatan rekor!';
-  let badgeColor = 'from-emerald-400 via-cyan-400 to-indigo-400';
+  let scoreColor = 'text-cyan-400';
 
   if (accuracyScore < 60) {
     rank = '⚠️ FIELD TECHNICIAN';
     rankDesc = 'Misi selesai. Tinjau kembali mekanisme 5 komponen & karakteristik komunikasi data pada laporan audit.';
-    badgeColor = 'from-amber-400 to-rose-400';
+    scoreColor = 'text-amber-400';
   } else if (accuracyScore < 85) {
     rank = '🛡️ NETWORK OPERATIONS SENTINEL';
     rankDesc = 'Kecakapan tinggi! Pertahanan dan perakitan jaringan data Anda sangat tangguh!';
-    badgeColor = 'from-cyan-400 to-indigo-400';
+    scoreColor = 'text-indigo-400';
   }
 
   container.innerHTML = `
     <div class="py-4 space-y-4 max-w-2xl mx-auto font-mono text-center select-none">
-      <div class="w-16 h-16 bg-gradient-to-tr from-cyan-500/20 via-indigo-500/20 to-emerald-500/20 text-cyan-400 rounded-3xl flex items-center justify-center mx-auto border border-cyan-500/40 shadow-2xl shadow-cyan-500/20 glow-pulse">
+      <div class="w-14 h-14 bg-cyan-500/10 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto border border-cyan-500/30 shadow-lg shadow-cyan-500/10">
         <i data-lucide="award" class="w-8 h-8"></i>
       </div>
 
@@ -1665,7 +1665,7 @@ function showFinalScoreboard() {
           </div>
           <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
             <span class="text-[10px] text-slate-500 block">TOTAL SKOR</span>
-            <span class="text-lg sm:text-xl font-black text-transparent bg-clip-text bg-gradient-to-r ${badgeColor}">${totalScore}</span>
+            <span class="text-lg sm:text-xl font-black ${scoreColor}">${totalScore}</span>
           </div>
         </div>
       </div>
