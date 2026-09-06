@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Komponen Komunikasi Data - Kuliah Interaktif</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- QRCode.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #090a0f;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Ambient Subtle Glows (Bukan neon murahan, clean tech aesthetic) */
+    .tech-card {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tech-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .slide {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Pulse node pipeline */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .node-pulse {
+      animation: pulse-ring 2.5s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Top Global Bar -->
+  <header class="h-16 border-b border-slate-800/80 px-8 flex items-center justify-between bg-[#0b0f19]/80 backdrop-blur z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.8)]"></div>
+      <span class="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold">Komdat // Bab II: Komponen Komunikasi Data</span>
+    </div>
+
+    <!-- Stepper Indicator -->
+    <div class="hidden md:flex items-center gap-2 font-mono text-xs text-slate-400">
+      <span id="slideIndicator" class="text-indigo-400 font-semibold">Slide 01 / 07</span>
+      <span class="text-slate-600">•</span>
+      <span id="slideTitlePreview" class="text-slate-300">Pendahuluan</span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button onclick="toggleMobileQuizModal()" class="px-3 py-1.5 rounded-lg border border-indigo-500/40 bg-indigo-500/10 text-indigo-300 text-xs font-medium hover:bg-indigo-500/20 transition flex items-center gap-2">
+        <i data-lucide="qr-code" class="w-4 h-4"></i> QR Soal HP
+      </button>
+      <button onclick="toggleFullscreen()" class="p-2 rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/60 transition" title="Fullscreen (F)">
+        <i data-lucide="maximize" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Slide Canvas Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-10 flex flex-col justify-center relative">
+
+    <!-- ================= SLIDE 1: COVER ELEGAN ================= -->
+    <section class="slide active flex-col justify-center items-start space-y-6">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-slate-700/60 bg-slate-800/40 text-xs text-slate-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Kuliah Interaktif & Demo Langsung
+      </div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
+        Sistem & Komponen <br /><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-sky-300 to-teal-300">Komunikasi Data</span>
+      </h1>
+      <p class="text-slate-400 text-lg max-w-2xl leading-relaxed">
+        Eksplorasi mendalam arsitektur 5 komponen utama, alur transmisi sinyal, karakteristik jaringan, simulasi paket real-time, serta demonstrasi langsung di kelas.
+      </p>
+      <div class="pt-4 flex items-center gap-4">
+        <button onclick="nextSlide()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm flex items-center gap-2 transition shadow-lg shadow-indigo-600/20">
+          Mulai Presentasi <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <span class="text-xs font-mono text-slate-500">Gunakan panah keyboard [&larr;] [&rarr;] untuk navigasi</span>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 2: 5 KOMPONEN UTAMA ================= -->
+    <section class="slide flex-col space-y-6">
+      <div>
+        <span class="font-mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Fondasi Utama</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight mt-1">5 Komponen Komunikasi Data</h2>
+        <p class="text-slate-400 text-sm mt-1">Struktur pembentuk jalur transfer informasi dari sumber hingga tujuan.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 pt-2">
+        <!-- 1. Sumber Data -->
+        <div class="tech-card p-5 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4">
+              <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-semibold text-white text-base">1. Sumber Data</h3>
+            <p class="font-mono text-xs text-indigo-400 mb-3">Data Source</p>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Titik awal penghasil informasi mentah (komputer, sensor, kamera, input user).
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono">Contoh: PC, Kamera CCTV</div>
+        </div>
+
+        <!-- 2. Pengirim -->
+        <div class="tech-card p-5 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-4">
+              <i data-lucide="send" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-semibold text-white text-base">2. Pengirim</h3>
+            <p class="font-mono text-xs text-sky-400 mb-3">Transmitter</p>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Mengubah & mengkodekan sinyal digital/analog serta memperkuat transmisi (modulasi).
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono">Contoh: Modem, NIC, Router</div>
+        </div>
+
+        <!-- 3. Media Transmisi -->
+        <div class="tech-card p-5 rounded-2xl flex flex-col justify-between border-indigo-500/30">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4">
+              <i data-lucide="git-commit" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-semibold text-white text-base">3. Media Transmisi</h3>
+            <p class="font-mono text-xs text-emerald-400 mb-3">Transmission Medium</p>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Jalur fisik/nirkabel perantara gelombang (Twisted pair, Fiber Optic, Radio RF)[cite: 1].
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono">Contoh: Kabel UTP, Wi-Fi 5GHz</div>
+        </div>
+
+        <!-- 4. Penerima -->
+        <div class="tech-card p-5 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+              <i data-lucide="download" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-semibold text-white text-base">4. Penerima</h3>
+            <p class="font-mono text-xs text-amber-400 mb-3">Receiver</p>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Menangkap sinyal, melakukan decoding sinyal kembali ke format data, & verifikasi eror[cite: 1].
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono">Contoh: Network Interface, Antenna</div>
+        </div>
+
+        <!-- 5. Tujuan -->
+        <div class="tech-card p-5 rounded-2xl flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center mb-4">
+              <i data-lucide="database" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-semibold text-white text-base">5. Tujuan</h3>
+            <p class="font-mono text-xs text-rose-400 mb-3">Destination</p>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Titik akhir tempat data diproses, dianalisis, disimpan, atau ditampilkan ke user[cite: 1].
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 font-mono">Contoh: Database Server, Monitor</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 3: SIMULASI ALUR INTERAKTIF ================= -->
+    <section class="slide flex-col space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <span class="font-mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Simulasi Arsitektur</span>
+          <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Diagram Blok & Pengiriman Paket</h2>
+          <p class="text-slate-400 text-sm mt-1">Tekan tombol untuk mengirim paket dan perhatikan proses translasi pada tiap node[cite: 1].</p>
+        </div>
+        <button id="btnSimulate" onclick="runPipelineSimulation()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-2 transition font-mono shadow-md">
+          <i data-lucide="play" class="w-4 h-4"></i> KIRIM PAKET DATA (SIMULASI)
+        </button>
+      </div>
+
+      <!-- Interactive Canvas Board -->
+      <div class="tech-card rounded-2xl p-6 relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 relative z-10">
+          
+          <!-- Node 1 -->
+          <div id="sim-node-1" class="p-4 rounded-xl border border-slate-800 bg-slate-900/80 transition-all duration-300 text-center">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1">01 // Source[cite: 1]</div>
+            <div class="font-bold text-slate-200 text-sm">Sumber Data</div>
+            <div class="text-xs text-slate-400 mt-2 font-mono bg-slate-950 p-2 rounded border border-slate-800" id="raw-payload">
+              Payload: "HALO"
+            </div>
+            <span class="inline-block mt-3 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Data Mentah[cite: 1]</span>
+          </div>
+
+          <!-- Node 2 -->
+          <div id="sim-node-2" class="p-4 rounded-xl border border-slate-800 bg-slate-900/80 transition-all duration-300 text-center">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1">02 // Transmitter[cite: 1]</div>
+            <div class="font-bold text-slate-200 text-sm">Pengirim</div>
+            <div class="text-xs text-slate-400 mt-2 font-mono bg-slate-950 p-2 rounded border border-slate-800" id="encoded-payload">
+              [Modulasi/Bit]
+            </div>
+            <span class="inline-block mt-3 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Encoding (01001000...)[cite: 1]</span>
+          </div>
+
+          <!-- Node 3 -->
+          <div id="sim-node-3" class="p-4 rounded-xl border border-slate-800 bg-slate-900/80 transition-all duration-300 text-center">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1">03 // Medium[cite: 1]</div>
+            <div class="font-bold text-slate-200 text-sm">Media Transmisi</div>
+            <div class="text-xs text-slate-400 mt-2 font-mono bg-slate-950 p-2 rounded border border-slate-800" id="channel-payload">
+              ~~~ Sinyal ~~~
+            </div>
+            <span class="inline-block mt-3 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Gelombang / Fiber[cite: 1]</span>
+          </div>
+
+          <!-- Node 4 -->
+          <div id="sim-node-4" class="p-4 rounded-xl border border-slate-800 bg-slate-900/80 transition-all duration-300 text-center">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1">04 // Receiver[cite: 1]</div>
+            <div class="font-bold text-slate-200 text-sm">Penerima</div>
+            <div class="text-xs text-slate-400 mt-2 font-mono bg-slate-950 p-2 rounded border border-slate-800" id="decoded-payload">
+              [Demodulasi]
+            </div>
+            <span class="inline-block mt-3 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Decoding & Error Check[cite: 1]</span>
+          </div>
+
+          <!-- Node 5 -->
+          <div id="sim-node-5" class="p-4 rounded-xl border border-slate-800 bg-slate-900/80 transition-all duration-300 text-center">
+            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-1">05 // Destination[cite: 1]</div>
+            <div class="font-bold text-slate-200 text-sm">Tujuan</div>
+            <div class="text-xs text-slate-400 mt-2 font-mono bg-slate-950 p-2 rounded border border-slate-800" id="dest-payload">
+              Status: Menunggu
+            </div>
+            <span class="inline-block mt-3 text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">Aplikasi / Database[cite: 1]</span>
+          </div>
+
+        </div>
+
+        <!-- Terminal Log Box -->
+        <div class="mt-6 bg-slate-950 rounded-xl p-4 border border-slate-800 font-mono text-xs">
+          <div class="flex items-center justify-between text-slate-500 border-b border-slate-900 pb-2 mb-2">
+            <span>TERMINAL LOG PENGIRIMAN</span>
+            <span id="logStatusBadge" class="text-emerald-400">SISTEM SIAP</span>
+          </div>
+          <div id="pipelineLogs" class="space-y-1 text-slate-400 h-20 overflow-y-auto">
+            <div>&gt; Tekan "Kirim Paket Data" untuk memulai visualisasi tracing data...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 4: KLASIFIKASI & KARAKTERISTIK ================= -->
+    <section class="slide flex-col space-y-6">
+      <div>
+        <span class="font-mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Teori & Standarisasi</span>
+        <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Klasifikasi & Karakteristik Komunikasi</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Kolom 1: Arah Komunikasi -->
+        <div class="tech-card p-6 rounded-2xl space-y-4">
+          <h3 class="font-bold text-white text-base flex items-center gap-2 border-b border-slate-800 pb-2">
+            <i data-lucide="repeat" class="w-4 h-4 text-indigo-400"></i> Berdasarkan Arah Komunikasi[cite: 1]
+          </h3>
+          <div class="space-y-3">
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800/80">
+              <div class="flex items-center justify-between font-mono text-xs font-semibold text-indigo-300">
+                <span>1. Simplex (Satu Arah)[cite: 1]</span>
+                <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded">TV, Radio[cite: 1]</span>
+              </div>
+              <p class="text-slate-400 text-xs mt-1">Penerima pasif tanpa kanal umpan balik sama sekali[cite: 1].</p>
+            </div>
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800/80">
+              <div class="flex items-center justify-between font-mono text-xs font-semibold text-sky-300">
+                <span>2. Half-Duplex (Dua Arah Bergantian)[cite: 1]</span>
+                <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded">Walkie-Talkie[cite: 1]</span>
+              </div>
+              <p class="text-slate-400 text-xs mt-1">Bisa mengirim & menerima, tetapi bergantian (tidak simultan)[cite: 1].</p>
+            </div>
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800/80">
+              <div class="flex items-center justify-between font-mono text-xs font-semibold text-emerald-300">
+                <span>3. Full-Duplex (Dua Arah Bersamaan)[cite: 1]</span>
+                <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded">Telepon, Video Call[cite: 1]</span>
+              </div>
+              <p class="text-slate-400 text-xs mt-1">Kedua pihak dapat berbicara dan mendengar secara serentak[cite: 1].</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom 2: 4 Karakteristik Komunikasi Data -->
+        <div class="tech-card p-6 rounded-2xl space-y-4">
+          <h3 class="font-bold text-white text-base flex items-center gap-2 border-b border-slate-800 pb-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> 4 Karakteristik Kunci Data Komunikasi[cite: 1]
+          </h3>
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+              <div class="font-mono text-xs font-semibold text-white">1. Pengiriman[cite: 1]</div>
+              <p class="text-slate-400 text-[11px] mt-1">Data harus sampai ke tujuan yang tepat dan eksklusif[cite: 1].</p>
+            </div>
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+              <div class="font-mono text-xs font-semibold text-white">2. Akurasi[cite: 1]</div>
+              <p class="text-slate-400 text-[11px] mt-1">Data tidak boleh terdistorsi atau korup saat diterima[cite: 1].</p>
+            </div>
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+              <div class="font-mono text-xs font-semibold text-white">3. Ketepatan Waktu[cite: 1]</div>
+              <p class="text-slate-400 text-[11px] mt-1">Data real-time (audio/video) tak boleh mengalami latensi tinggi[cite: 1].</p>
+            </div>
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+              <div class="font-mono text-xs font-semibold text-white">4. Jitter[cite: 1]</div>
+              <p class="text-slate-400 text-[11px] mt-1">Variasi jeda kedatangan antar-paket data di sisi penerima[cite: 1].</p>
+            </div>
+          </div>
+          <div class="p-3 bg-indigo-950/40 rounded-xl border border-indigo-900/40 text-[11px] text-indigo-300 font-mono">
+            Mode Transmisi Tambahan: Serial (1 bit berurutan, USB) vs Paralel (multi-bit simultan, Bus CPU)[cite: 1].
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 5: PRAKTIKUM LANGSUNG DI KELAS ================= -->
+    <section class="slide flex-col space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <span class="font-mono text-xs text-emerald-400 uppercase tracking-wider font-semibold">Live Experiment</span>
+          <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Praktikum Langsung: Simulasi Jitter & Delay</h2>
+          <p class="text-slate-400 text-sm mt-1">Buktikan perbedaan transmisi ideal vs jaringan tidak stabil langsung di layar!</p>
+        </div>
+      </div>
+
+      <div class="tech-card p-6 rounded-2xl grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Panel Kontrol Praktikum -->
+        <div class="space-y-4">
+          <div class="text-xs font-mono text-slate-400 uppercase tracking-wider">Parameter Pengujian Jaringan</div>
+          
+          <div>
+            <label class="text-xs text-slate-300 block mb-1">Simulasi Bandwidth / Latency Basis (ms)</label>
+            <input type="range" id="simLatency" min="10" max="250" value="30" class="w-full accent-indigo-500" />
+            <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+              <span>Fiber (10ms)</span>
+              <span id="latencyVal" class="text-indigo-400">30 ms</span>
+              <span>Satelit (250ms)</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-slate-300 block mb-1">Intensitas Gangguan Jitter (Fluktuasi Jeda)</label>
+            <input type="range" id="simJitter" min="0" max="150" value="10" class="w-full accent-indigo-500" />
+            <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+              <span>Nol (Stabil)</span>
+              <span id="jitterVal" class="text-indigo-400">10 ms</span>
+              <span>Tinggi (Kacau)</span>
+            </div>
+          </div>
+
+          <button onclick="runNetworkExperiment()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs font-mono flex items-center justify-center gap-2 transition">
+            <i data-lucide="activity" class="w-4 h-4"></i> JALANKAN TEST 5 PAKET DATA
+          </button>
+        </div>
+
+        <!-- Visualisasi Jalur Paket -->
+        <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+          <div class="text-xs font-mono text-slate-500 border-b border-slate-900 pb-2 flex justify-between">
+            <span>HASIL REKAM TRANSMISI REAL-TIME</span>
+            <span id="expResultBadge" class="text-slate-400">Menunggu Pengujian</span>
+          </div>
+
+          <div id="packetTrackList" class="space-y-2 py-4">
+            <div class="text-xs font-mono text-slate-600 text-center py-6">
+              Tekan tombol "Jalankan Test" untuk melihat variasi kedatangan bit data.
+            </div>
+          </div>
+
+          <div class="border-t border-slate-900 pt-2 text-[11px] font-mono text-slate-400 flex justify-between">
+            <span>*Demonstrasi nyata mengapa Jitter mempengaruhi kualitas live streaming & VoIP[cite: 1].</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 6: QR CODE & KUIS AUDIENS ================= -->
+    <section class="slide flex-col space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+          <span class="font-mono text-xs text-indigo-400 uppercase tracking-wider font-semibold">Interaksi Peserta</span>
+          <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Mini-Game: Kuis Interaktif 10 Soal</h2>
+          <p class="text-slate-400 text-sm mt-1">Audiens dapat memindai QR Code untuk menjawab langsung di smartphone masing-masing!</p>
+        </div>
+      </div>
+
+      <div class="tech-card p-6 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <!-- Box QR Code -->
+        <div class="flex flex-col items-center justify-center p-6 bg-slate-950 rounded-xl border border-slate-800 text-center space-y-3">
+          <div id="qrcodeCanvas" class="p-3 bg-white rounded-xl shadow-lg"></div>
+          <span class="text-xs font-mono text-indigo-300 font-semibold">Scan untuk Membuka Soal di HP</span>
+          <p class="text-[11px] text-slate-500">Bisa juga dibuka langsung dengan tombol di bawah jika tidak membawa HP.</p>
+          <button onclick="toggleMobileQuizModal()" class="text-xs font-mono text-indigo-400 underline hover:text-indigo-300">
+            Buka Simulator HP di Layar
+          </button>
+        </div>
+
+        <!-- Ringkasan Kuis di Layar Proyektor -->
+        <div class="md:col-span-2 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="font-semibold text-white text-base">Status Kuis Audiens</div>
+            <div class="font-mono text-xs px-3 py-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              Total 10 Soal Berbobot
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+            <div class="p-3 bg-slate-900/70 rounded-lg border border-slate-800">
+              <span class="text-slate-500">Cakupan Materi:</span>
+              <div class="text-slate-200 mt-1">5 Komponen, Simplex/Duplex, Mode Serial/Paralel, Karakteristik Data[cite: 1]</div>
+            </div>
+            <div class="p-3 bg-slate-900/70 rounded-lg border border-slate-800">
+              <span class="text-slate-500">Mekanisme:</span>
+              <div class="text-slate-200 mt-1">Pilihan ganda instan, feedback skor langsung di HP masing-masing</div>
+            </div>
+          </div>
+
+          <div class="p-4 bg-slate-900/40 rounded-xl border border-slate-800/80 text-xs text-slate-400 space-y-2">
+            <div class="font-semibold text-slate-200">Panduan Presenter:</div>
+            <ul class="list-disc pl-4 space-y-1">
+              <li>Beri waktu 3 menit kepada seluruh teman kelas untuk scan QR.</li>
+              <li>Ajak salah satu mahasiswa membacakan jawaban soal nomor favorit.</li>
+              <li>Jadikan skor tertinggi sebagai penerima apresiasi di kelas.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SLIDE 7: PENUTUP UNIK ================= -->
+    <section class="slide flex-col justify-center items-center text-center space-y-6">
+      <div class="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center border border-rose-500/30">
+        <i data-lucide="shield-alert" class="w-8 h-8"></i>
+      </div>
+      
+      <div class="space-y-3 max-w-3xl">
+        <span class="font-mono text-xs uppercase tracking-widest text-rose-400 font-bold bg-rose-950/40 border border-rose-800/40 px-3 py-1 rounded-full">
+          Q&amp;A Session Rules
+        </span>
+        
+        <!-- TEKS PERMINTAAN USER SESUAI PROMPT -->
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-tight font-mono">
+          "KETAHUAN BERTANYA = <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-orange-400 to-amber-300">
+            KAMI HAJAR DITEMPAT
+          </span>"
+        </h1>
+
+        <p class="text-slate-400 text-sm md:text-base max-w-xl mx-auto pt-2">
+          (Bercanda, silakan jika ada rekan-rekan atau Bapak/Ibu Dosen yang ingin memberikan tanggapan, sanggahan, atau pertanyaan terkait sistem komunikasi data).
+        </p>
+      </div>
+
+      <div class="pt-6">
+        <button onclick="goToSlide(0)" class="px-5 py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/60 font-mono text-xs transition">
+          &larr; Kembali ke Awal Presentasi
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Floating Control Bar -->
+  <footer class="h-16 border-t border-slate-800/80 px-8 flex items-center justify-between bg-[#0b0f19]/80 backdrop-blur z-50">
+    <div class="flex items-center gap-2">
+      <button onclick="prevSlide()" class="p-2 rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 transition">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+      </button>
+      <button onclick="nextSlide()" class="p-2 rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 transition">
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Slide Dots -->
+    <div id="slideDots" class="flex items-center gap-2">
+      <!-- Generated via JS -->
+    </div>
+
+    <div class="font-mono text-xs text-slate-500">
+      Bab II • Komponen Komdat
+    </div>
+  </footer>
+
+  <!-- ================= MODAL / POPUP SMARTPHONE KUIS (10 SOAL) ================= -->
+  <div id="quizModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="tech-card bg-slate-950 border-slate-700 w-full max-w-md rounded-3xl p-6 flex flex-col h-[85vh] justify-between shadow-2xl">
+      
+      <!-- Top Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="smartphone" class="w-4 h-4 text-indigo-400"></i>
+          <span class="font-mono text-xs text-slate-300 font-semibold">Tampilan Kuis Mobile</span>
+        </div>
+        <button onclick="toggleMobileQuizModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quiz Body Content -->
+      <div id="quizBox" class="flex-1 overflow-y-auto py-4">
+        <!-- Question Indicator & Score -->
+        <div class="flex justify-between items-center text-xs font-mono text-slate-400 mb-3">
+          <span id="quizQuestionIdx">Pertanyaan 1 / 10</span>
+          <span id="quizScoreText" class="text-indigo-400 font-semibold">Skor: 0</span>
+        </div>
+
+        <div id="quizQuestionTitle" class="text-sm font-semibold text-white mb-4 leading-relaxed">
+          Loading soal...
+        </div>
+
+        <!-- Choice Buttons -->
+        <div id="quizChoices" class="space-y-2.5">
+          <!-- Populated via JS -->
+        </div>
+
+        <div id="quizExplanation" class="hidden mt-4 p-3 bg-slate-900 rounded-xl border border-slate-800 text-xs text-slate-400">
+        </div>
+      </div>
+
+      <!-- Footer Action -->
+      <div class="border-t border-slate-800 pt-3 flex justify-between items-center">
+        <button id="btnNextQuiz" onclick="nextQuizQuestion()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">
+          Lanjut ke Soal Berikutnya
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. DATA SLIDE & STATE
+    // ==========================================
+    const slides = document.querySelectorAll('.slide');
+    const slideTitles = [
+      "Cover & Pembukaan",
+      "5 Komponen Data",
+      "Simulasi Alur Blok",
+      "Klasifikasi & Jitter",
+      "Praktikum Live",
+      "Kuis Interaktif Audiens",
+      "Sesi Tanya Jawab"
+    ];
+    let currentSlide = 0;
+
+    function renderDots() {
+      const dotContainer = document.getElementById('slideDots');
+      dotContainer.innerHTML = '';
+      slides.forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `w-2 h-2 rounded-full transition-all ${idx === currentSlide ? 'w-6 bg-indigo-500' : 'bg-slate-700 hover:bg-slate-500'}`;
+        dot.onclick = () => goToSlide(idx);
+        dotContainer.appendChild(dot);
+      });
+    }
+
+    function updateSlideUI() {
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === currentSlide);
+      });
+      document.getElementById('slideIndicator').innerText = `Slide 0${currentSlide + 1} / 0${slides.length}`;
+      document.getElementById('slideTitlePreview').innerText = slideTitles[currentSlide];
+      renderDots();
+      lucide.createIcons();
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlideUI();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlideUI();
+      }
+    }
+
+    function goToSlide(idx) {
+      currentSlide = idx;
+      updateSlideUI();
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key.toLowerCase() === 'f') toggleFullscreen();
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // ==========================================
+    // 2. SIMULASI PIPELINE PENGIRIMAN PAKET (SLIDE 3)
+    // ==========================================
+    let isSimulating = false;
+    async function runPipelineSimulation() {
+      if (isSimulating) return;
+      isSimulating = true;
+
+      const logBox = document.getElementById('pipelineLogs');
+      const logStatus = document.getElementById('logStatusBadge');
+      const nodes = [
+        document.getElementById('sim-node-1'),
+        document.getElementById('sim-node-2'),
+        document.getElementById('sim-node-3'),
+        document.getElementById('sim-node-4'),
+        document.getElementById('sim-node-5')
+      ];
+
+      logBox.innerHTML = '';
+      logStatus.innerText = 'TRANSMISI BERJALAN...';
+      logStatus.className = 'text-amber-400';
+
+      const log = (msg) => {
+        const item = document.createElement('div');
+        item.innerHTML = `&gt; ${msg}`;
+        logBox.appendChild(item);
+        logBox.scrollTop = logBox.scrollHeight;
+      };
+
+      const resetHighlight = () => {
+        nodes.forEach(n => {
+          n.classList.remove('border-indigo-500', 'bg-indigo-950/40', 'border-emerald-500', 'bg-emerald-950/40');
+        });
+      };
+
+      // Step 1: Source
+      resetHighlight();
+      nodes[0].classList.add('border-indigo-500', 'bg-indigo-950/40');
+      log('<span class="text-indigo-400">[Sumber Data]</span> Komputer menghasilkan string pesan mentah: "HALO"');
+      await new Promise(r => setTimeout(r, 900));
+
+      // Step 2: Transmitter
+      resetHighlight();
+      nodes[1].classList.add('border-indigo-500', 'bg-indigo-950/40');
+      document.getElementById('encoded-payload').innerText = '01001000 01000001...';
+      log('<span class="text-sky-400">[Pengirim / NIC]</span> Mengkodekan data menjadi deretan bit digital & modulasi frekuensi.');
+      await new Promise(r => setTimeout(r, 900));
+
+      // Step 3: Transmission Medium
+      resetHighlight();
+      nodes[2].classList.add('border-indigo-500', 'bg-indigo-950/40');
+      document.getElementById('channel-payload').innerText = '101100101 (Gelombang RF)';
+      log('<span class="text-emerald-400">[Media Transmisi]</span> Mengalirkan sinyal melewati media fisik tanpa tabrakan.');
+      await new Promise(r => setTimeout(r, 1000));
+
+      // Step 4: Receiver
+      resetHighlight();
+      nodes[3].classList.add('border-indigo-500', 'bg-indigo-950/40');
+      document.getElementById('decoded-payload').innerText = 'Decoding OK | Parity Valid';
+      log('<span class="text-amber-400">[Penerima]</span> Menangkap sinyal, memeriksa integritas data, dan menerjemahkan bit.');
+      await new Promise(r => setTimeout(r, 900));
+
+      // Step 5: Destination
+      resetHighlight();
+      nodes[4].classList.add('border-emerald-500', 'bg-emerald-950/40');
+      document.getElementById('dest-payload').innerText = 'Pesan Diterima: "HALO"';
+      log('<span class="text-emerald-400">[Tujuan]</span> Data sukses diterima dan dirender pada layar tujuan tanpa eror!');
+      
+      logStatus.innerText = 'SELESAI 100%';
+      logStatus.className = 'text-emerald-400';
+      isSimulating = false;
+    }
+
+    // ==========================================
+    // 3. PRAKTIKUM LIVE: SIMULASI JITTER & DELAY (SLIDE 5)
+    // ==========================================
+    const latencySlider = document.getElementById('simLatency');
+    const jitterSlider = document.getElementById('simJitter');
+    const latencyVal = document.getElementById('latencyVal');
+    const jitterVal = document.getElementById('jitterVal');
+
+    latencySlider.oninput = () => latencyVal.innerText = `${latencySlider.value} ms`;
+    jitterSlider.oninput = () => jitterVal.innerText = `${jitterSlider.value} ms`;
+
+    async function runNetworkExperiment() {
+      const trackList = document.getElementById('packetTrackList');
+      const badge = document.getElementById('expResultBadge');
+      trackList.innerHTML = '';
+      badge.innerText = 'Menguji 5 Paket...';
+      badge.className = 'text-amber-400';
+
+      const baseLat = parseInt(latencySlider.value);
+      const jitterAmount = parseInt(jitterSlider.value);
+
+      for (let i = 1; i <= 5; i++) {
+        // Simulasi variasi jeda kedatangan (Jitter)
+        const randomJitter = Math.floor((Math.random() * 2 - 1) * jitterAmount);
+        const actualDelay = Math.max(5, baseLat + randomJitter);
+
+        await new Promise(r => setTimeout(r, 200));
+
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between text-xs font-mono p-2 bg-slate-900 rounded border border-slate-800';
+        item.innerHTML = `
+          <span class="text-slate-300">Paket #${i} [Seq ${i * 64}B]</span>
+          <span class="text-slate-400">Delay: ${actualDelay} ms</span>
+          <span class="${actualDelay > 100 ? 'text-rose-400' : 'text-emerald-400'}">
+            ${actualDelay > 100 ? 'Terlambat / Jitter Tinggi' : 'Stabil'}
+          </span>
+        `;
+        trackList.appendChild(item);
+      }
+
+      badge.innerText = 'Uji Selesai';
+      badge.className = 'text-emerald-400';
+    }
+
+    // ==========================================
+    // 4. 10 PERTANYAAN KUIS (SESUAI PDF KOMDAT)
+    // ==========================================
+    const quizData = [
+      {
+        q: "1. Komponen yang bertugas menghasilkan data atau informasi mentah sebelum dikirim adalah...",
+        options: ["A. Transmitter", "B. Sumber Data (Data Source)", "C. Receiver", "D. Media Transmisi"],
+        ans: 1,
+        exp: "Sumber data adalah titik awal perangkat yang menghasilkan informasi mentah (komputer, sensor, kamera)."
+      },
+      {
+        q: "2. Proses mengubah sinyal kembali menjadi bentuk data asli yang dapat dimengerti di sisi penerima disebut...",
+        options: ["A. Encoding", "B. Modulasi", "C. Decoding", "D. Multiplexing"],
+        ans: 2,
+        exp: "Decoding dilakukan oleh receiver untuk mengembalikan sinyal transmisi ke data aslinya."
+      },
+      {
+        q: "3. Komunikasi siaran radio dan televisi termasuk dalam klasifikasi arah komunikasi...",
+        options: ["A. Simplex", "B. Half-Duplex", "C. Full-Duplex", "D. Dual-Simplex"],
+        ans: 0,
+        exp: "Simplex adalah komunikasi satu arah di mana penerima tidak dapat mengirimkan umpan balik."
+      },
+      {
+        q: "4. Perangkat Walkie-Talkie merupakan contoh nyata dari mode komunikasi...",
+        options: ["A. Simplex", "B. Half-Duplex", "C. Full-Duplex", "D. Broadcast"],
+        ans: 1,
+        exp: "Half-Duplex memungkinkan komunikasi dua arah tetapi secara bergantian, tidak bersamaan."
+      },
+      {
+        q: "5. Panggilan telepon atau video conference berjalan secara simultan dua arah, termasuk...",
+        options: ["A. Half-Duplex", "B. Simplex", "C. Point-to-Point", "D. Full-Duplex"],
+        ans: 3,
+        exp: "Full-Duplex memungkinkan kedua belah pihak mengirim dan menerima data di waktu yang sama."
+      },
+      {
+        q: "6. Karakteristik variasi waktu kedatangan antar-paket data pada penerima disebut...",
+        options: ["A. Akurasi", "B. Jitter", "C. Ketepatan Waktu", "D. Bandwidth"],
+        ans: 1,
+        exp: "Jitter mengacu pada variasi jeda atau ketidaksinkronan kedatangan paket data pada penerima."
+      },
+      {
+        q: "7. Mode transmisi di mana bit-bit data dikirim satu per satu secara berurutan melalui satu jalur adalah...",
+        options: ["A. Serial Transmission", "B. Parallel Transmission", "C. Multicast", "D. Direct Link"],
+        ans: 0,
+        exp: "Transmisi serial mengirimkan bit satu demi satu melalui jalur tunggal (contoh: kabel USB)."
+      },
+      {
+        q: "8. Pengiriman data internal komputer antara CPU dan Memori melalui bus data umumnya menggunakan...",
+        options: ["A. Transmisi Serial", "B. Transmisi Paralel", "C. Broadcast", "D. Simplex"],
+        ans: 1,
+        exp: "Transmisi paralel mengirim beberapa bit secara simultan melalui jalur terpisah (cocok jarak pendek berkecepatan tinggi)."
+      },
+      {
+        q: "9. Metode pengiriman data ke sekelompok penerima tertentu dalam satu grup disebut...",
+        options: ["A. Broadcast", "B. Point-to-Point", "C. Multicast", "D. Simplex"],
+        ans: 2,
+        exp: "Multicast mendistribusikan data hanya ke sekelompok node tertentu, bukan ke seluruh jaringan."
+      },
+      {
+        q: "10. Komponen yang bertugas mengkodekan data dan melakukan modulasi agar sesuai dengan media fisik adalah...",
+        options: ["A. Data Source", "B. Pengirim (Transmitter)", "C. Destination", "D. Hub"],
+        ans: 1,
+        exp: "Transmitter bertugas memformat, memodulasi, dan memperkuat sinyal sebelum diteruskan ke media transmisi."
+      }
+    ];
+
+    let currentQuizIndex = 0;
+    let quizScore = 0;
+    let answered = false;
+
+    function renderQuizQuestion() {
+      const q = quizData[currentQuizIndex];
+      document.getElementById('quizQuestionIdx').innerText = `Pertanyaan ${currentQuizIndex + 1} / ${quizData.length}`;
+      document.getElementById('quizScoreText').innerText = `Skor: ${quizScore}`;
+      document.getElementById('quizQuestionTitle').innerText = q.q;
+
+      const choicesBox = document.getElementById('quizChoices');
+      choicesBox.innerHTML = '';
+      answered = false;
+
+      const expBox = document.getElementById('quizExplanation');
+      expBox.classList.add('hidden');
+      expBox.innerText = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-left p-3 rounded-xl border border-slate-800 bg-slate-900 text-xs text-slate-300 hover:border-slate-600 hover:bg-slate-800/80 transition flex items-center justify-between';
+        btn.innerHTML = `<span>${opt}</span><span id="opt-check-${idx}"></span>`;
+        btn.onclick = () => selectQuizAnswer(idx, btn);
+        choicesBox.appendChild(btn);
+      });
+
+      document.getElementById('btnNextQuiz').innerText = currentQuizIndex === quizData.length - 1 ? "Selesai Kuis" : "Lanjut ke Soal Berikutnya";
+    }
+
+    function selectQuizAnswer(selectedIndex, buttonElem) {
+      if (answered) return;
+      answered = true;
+
+      const q = quizData[currentQuizIndex];
+      const choices = document.getElementById('quizChoices').children;
+      const expBox = document.getElementById('quizExplanation');
+
+      if (selectedIndex === q.ans) {
+        quizScore += 10;
+        buttonElem.classList.remove('bg-slate-900', 'border-slate-800');
+        buttonElem.classList.add('bg-emerald-950/60', 'border-emerald-500', 'text-emerald-300');
+        document.getElementById(`opt-check-${selectedIndex}`).innerHTML = '✓ Benar';
+      } else {
+        buttonElem.classList.remove('bg-slate-900', 'border-slate-800');
+        buttonElem.classList.add('bg-rose-950/60', 'border-rose-500', 'text-rose-300');
+        document.getElementById(`opt-check-${selectedIndex}`).innerHTML = '✗ Salah';
+
+        // Highlight the correct one
+        choices[q.ans].classList.add('bg-emerald-950/40', 'border-emerald-500/60', 'text-emerald-400');
+      }
+
+      document.getElementById('quizScoreText').innerText = `Skor: ${quizScore}`;
+      expBox.classList.remove('hidden');
+      expBox.innerHTML = `<strong>Penjelasan:</strong> ${q.exp}`;
+    }
+
+    function nextQuizQuestion() {
+      if (!answered && currentQuizIndex < quizData.length) {
+        alert("Pilih salah satu jawaban terlebih dahulu!");
+        return;
+      }
+
+      if (currentQuizIndex < quizData.length - 1) {
+        currentQuizIndex++;
+        renderQuizQuestion();
+      } else {
+        // Tampilan Hasil Akhir
+        document.getElementById('quizBox').innerHTML = `
+          <div class="text-center py-10 space-y-4">
+            <div class="w-16 h-16 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto border border-indigo-500/30">
+              <i data-lucide="award" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">Kuis Selesai!</h3>
+            <p class="text-slate-400 text-xs">Total Skor yang Anda peroleh:</p>
+            <div class="text-4xl font-extrabold text-indigo-400 font-mono">${quizScore} / 100</div>
+            <p class="text-slate-500 text-[11px]">Terima kasih telah berpartisipasi aktif dalam sesi materi ini!</p>
+          </div>
+        `;
+        document.getElementById('btnNextQuiz').innerText = "Tutup Kuis";
+        document.getElementById('btnNextQuiz').onclick = () => toggleMobileQuizModal();
+        lucide.createIcons();
+      }
+    }
+
+    function toggleMobileQuizModal() {
+      const modal = document.getElementById('quizModal');
+      modal.classList.toggle('hidden');
+      if (!modal.classList.contains('hidden')) {
+        currentQuizIndex = 0;
+        quizScore = 0;
+        renderQuizQuestion();
+      }
+    }
+
+    // ==========================================
+    // 5. GENERATE QR CODE DINAMIS
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSlideUI();
+      
+      // QR mengarah ke URL saat ini atau fallback kuis link
+      const targetUrl = window.location.href.includes('http') ? window.location.href : 'https://google.com';
+      new QRCode(document.getElementById("qrcodeCanvas"), {
+        text: targetUrl,
+        width: 140,
+        height: 140,
+        colorDark : "#090a0f",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.M
+      });
+
+      renderQuizQuestion();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
