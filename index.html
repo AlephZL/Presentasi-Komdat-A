@@ -475,30 +475,37 @@
       </div>
     </section>
 
-    <!-- ================= SLIDE 6: KOMDAT CYBER CTF (7 TAHAPAN TANTANGAN) ================= -->
+    <!-- ================= SLIDE 6: KOMDAT CYBER CTF (10 TAHAPAN TANTANGAN) ================= -->
     <section class="slide flex-col space-y-4">
       <!-- Game Top Header & Control Bar -->
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-bold mb-1">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 🛡️ Cybersecurity CTF Challenge • 7 Tahapan Ketat
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 🛡️ Cybersecurity CTF Challenge • 10 Tahapan Ketat
           </div>
-          <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">KomDat Cyber CTF: Operation Packet Defender</h2>
+          <h2 class="text-xl md:text-3xl font-extrabold text-white tracking-tight">KomDat Cyber CTF: Operation Packet Defender</h2>
         </div>
 
-        <!-- Mode Selector & Live Stats -->
-        <div class="flex items-center gap-2 font-mono text-xs">
-          <div class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-2">
-            <span>Points: <span id="arcadeScore" class="text-amber-400 font-extrabold text-sm">0</span></span>
+        <!-- Live Stats & Action Controls -->
+        <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+          <div class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-1.5">
+            <i data-lucide="timer" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span id="arcadeTimer" class="text-amber-300 font-mono font-extrabold">00:00.0</span>
           </div>
-          <div class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-2">
-            <span>Tahap: <span id="arcadeCombo" class="text-cyan-400 font-extrabold text-sm">1/7</span></span>
+          <div class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-1.5">
+            <span>Points: <span id="arcadeScore" class="text-emerald-400 font-extrabold text-sm">0</span></span>
           </div>
+          <div class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-1.5">
+            <span>Tahap: <span id="arcadeCombo" class="text-cyan-400 font-extrabold text-sm">1/10</span></span>
+          </div>
+          <button onclick="openLeaderboardModal()" class="px-3 py-1.5 rounded-lg border border-amber-500/50 bg-amber-500/20 text-amber-300 font-mono text-xs font-bold hover:bg-amber-500/30 transition flex items-center gap-1.5 cursor-pointer shadow-md">
+            <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-400"></i> <span class="hidden sm:inline">Papan Skor</span><span class="sm:hidden">Skor</span>
+          </button>
           <button onclick="openDirectGameQRModal()" class="px-3 py-1.5 rounded-lg border border-cyan-500/50 bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold hover:bg-cyan-500/30 transition flex items-center gap-1.5 cursor-pointer shadow-md">
-            <i data-lucide="qr-code" class="w-3.5 h-3.5 text-cyan-400"></i> QR Main di HP
+            <i data-lucide="qr-code" class="w-3.5 h-3.5 text-cyan-400"></i> <span class="hidden sm:inline">QR HP</span>
           </button>
           <button onclick="restartCtfGame()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md">
-            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset Misi
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
           </button>
         </div>
       </div>
@@ -586,6 +593,42 @@
       <!-- Footer Close Button -->
       <div class="border-t border-slate-800 pt-3">
         <button id="btnNextQuiz" onclick="closeDirectGameQRModal()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs font-mono transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= POPUP LEADERBOARD PAPAN SKOR ================= -->
+  <div id="leaderboardModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="tech-card bg-slate-950 border-slate-700 w-full max-w-lg rounded-3xl p-5 sm:p-6 flex flex-col max-h-[90vh] shadow-2xl space-y-4">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+            <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i>
+          </div>
+          <div>
+            <h3 class="font-mono text-sm text-white font-bold">Papan Peringkat CTF (Top Agents)</h3>
+            <p class="text-[11px] text-slate-400">Dihitung berdasarkan Keakuratan Poin & Waktu Tercepat</p>
+          </div>
+        </div>
+        <button onclick="closeLeaderboardModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Leaderboard Table Container -->
+      <div id="leaderboardContent" class="overflow-y-auto flex-1 space-y-2 pr-1 text-xs font-mono max-h-[55vh]">
+        <!-- Rendered dynamically by js/quiz.js -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between border-t border-slate-800 pt-3 gap-2">
+        <button onclick="resetLeaderboardData()" class="text-slate-500 hover:text-rose-400 text-[11px] font-mono transition">
+          Reset Riwayat
+        </button>
+        <button onclick="closeLeaderboardModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs font-mono transition">
           Tutup
         </button>
       </div>

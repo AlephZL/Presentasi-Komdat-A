@@ -8,7 +8,7 @@ const slideTitles = [
   "Simulasi Payload Teks Kustom",
   "Klasifikasi Arah & Karakteristik",
   "Live Oscilloscope & Jitter",
-  "KomDat Cyber CTF: 7 Tahapan",
+  "KomDat Cyber CTF: 10 Tahapan",
   "Sesi Q&A & Penutup"
 ];
 let currentSlide = 0;

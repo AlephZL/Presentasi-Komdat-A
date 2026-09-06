@@ -83,3 +83,89 @@ body {
 .animate-signal-flow {
   animation: signalFlow 1.8s infinite linear;
 }
+
+/* Radio Frequency Ripple (Stage 5 Antenna) */
+@keyframes radioRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+.animate-radio-ripple {
+  animation: radioRipple 2s infinite cubic-bezier(0, 0.2, 0.8, 1);
+}
+
+/* Bus Packet Flow Animation (Stage 1 & Stage 3) */
+@keyframes busFlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-bus-flow {
+  animation: busFlow 1.5s infinite linear;
+}
+
+/* Jitter Wave Shiver Animation (Stage 9) */
+@keyframes jitterShiver {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+.animate-jitter-shiver {
+  animation: jitterShiver 0.25s infinite ease-in-out;
+}
+
+/* Laser Neon Pulse Glow (Stage 4) */
+@keyframes laserNeonPulse {
+  0%, 100% { filter: drop-shadow(0 0 8px #06b6d4) drop-shadow(0 0 16px #06b6d4); }
+  50% { filter: drop-shadow(0 0 16px #3b82f6) drop-shadow(0 0 28px #3b82f6); }
+}
+.animate-laser-pulse {
+  animation: laserNeonPulse 1.6s infinite ease-in-out;
+}
+
+/* Cyber Scanning Line */
+@keyframes cyberScan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1000%); }
+}
+.animate-cyber-scan {
+  animation: cyberScan 3s infinite linear;
+}
+
+/* Touch targets and mobile responsiveness */
+@media (max-width: 640px) {
+  header {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  main {
+    padding: 0.75rem !important;
+    padding-bottom: 5.5rem !important;
+  }
+  .slide {
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 0.25rem;
+  }
+  #arcadeStageContainer {
+    min-height: auto !important;
+    padding: 1rem !important;
+  }
+  footer {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .slide {
+    max-height: calc(100vh - 8.5rem);
+    overflow-y: auto;
+  }
+}
+
