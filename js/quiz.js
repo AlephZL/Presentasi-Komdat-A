@@ -210,7 +210,7 @@ function stopCtfTimer() {
   }
 }
 
-// 4. REAL-TIME CLOUD & LOCALSTORAGE LEADERBOARD (ZERO BOTS, REAL USERS ONLY)
+// 4. REAL-TIME CLOUD & LOCALSTORAGE LEADERBOARD (SINGLE COMBINED CRITERION)
 const LEADERBOARD_KEY = 'komdat_ctf_real_leaderboard_v3';
 const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a067127101a0778378632966';
 const leaderboardChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('komdat_leaderboard_channel') : null;
@@ -257,6 +257,35 @@ async function fetchCloudLeaderboard() {
   return null;
 }
 
+// KRITERIA PENILAIAN TUNGGAL: KOMBINASI AKURASI & WAKTU TERCEPAT
+function calculateCombinedScore(item) {
+  if (typeof item.totalScore === 'number' && item.totalScore > 0) {
+    return item.totalScore;
+  }
+  const acc = typeof item.accuracy === 'number' ? item.accuracy : (typeof item.score === 'number' ? item.score : 0);
+  const time = typeof item.timeSec === 'number' ? item.timeSec : 120;
+  const timeBonus = Math.max(0, Math.round(240 - time));
+  return (acc * 10) + timeBonus;
+}
+
+function sortLeaderboardEntries(list) {
+  if (!list || !Array.isArray(list)) return [];
+  const cloned = [...list];
+  cloned.sort((a, b) => {
+    const scoreA = calculateCombinedScore(a);
+    const scoreB = calculateCombinedScore(b);
+    if (scoreB !== scoreA) return scoreB - scoreA;
+    const timeA = typeof a.timeSec === 'number' ? a.timeSec : 999999;
+    const timeB = typeof b.timeSec === 'number' ? b.timeSec : 999999;
+    return timeA - timeB;
+  });
+  return cloned.map((it, idx) => ({
+    ...it,
+    rank: idx + 1,
+    combinedScore: calculateCombinedScore(it)
+  }));
+}
+
 async function syncAndGetLeaderboard() {
   let localList = getLocalLeaderboard();
   const cloudList = await fetchCloudLeaderboard();
@@ -264,15 +293,14 @@ async function syncAndGetLeaderboard() {
   if (cloudList) {
     const mergedMap = new Map();
     [...cloudList, ...localList].forEach(item => {
-      const key = item.token || (item.name + '_' + item.timeSec);
+      const key = item.token || (item.name + '_' + item.timeSec + '_' + (item.totalScore || item.score || 0));
       if (!mergedMap.has(key)) {
         mergedMap.set(key, item);
       }
     });
 
     const merged = Array.from(mergedMap.values());
-    merged.sort((a, b) => b.totalScore !== a.totalScore ? b.totalScore - a.totalScore : a.timeSec - b.timeSec);
-    const ranked = merged.slice(0, 20).map((it, idx) => ({ ...it, rank: idx + 1 }));
+    const ranked = sortLeaderboardEntries(merged).slice(0, 30);
 
     try {
       localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(ranked));
@@ -281,17 +309,16 @@ async function syncAndGetLeaderboard() {
     return ranked;
   }
 
-  localList.sort((a, b) => b.totalScore !== a.totalScore ? b.totalScore - a.totalScore : a.timeSec - b.timeSec);
-  return localList.map((it, idx) => ({ ...it, rank: idx + 1 }));
+  return sortLeaderboardEntries(localList);
 }
 
 async function saveScoreToLeaderboard(entry) {
   try {
     let list = getLocalLeaderboard();
     list.push(entry);
-    list.sort((a, b) => b.totalScore !== a.totalScore ? b.totalScore - a.totalScore : a.timeSec - b.timeSec);
-    const top20 = list.slice(0, 20).map((item, idx) => ({ ...item, rank: idx + 1 }));
-    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(top20));
+    const sorted = sortLeaderboardEntries(list);
+    const top30 = sorted.slice(0, 30);
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(top30));
 
     if (leaderboardChannel) {
       leaderboardChannel.postMessage({ type: 'REFRESH_LEADERBOARD' });
@@ -301,10 +328,10 @@ async function saveScoreToLeaderboard(entry) {
     fetch(CLOUD_SYNC_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'KOMDAT_CTF_LEADERBOARD', data: { scores: top20 } })
+      body: JSON.stringify({ name: 'KOMDAT_CTF_LEADERBOARD', data: { scores: top30 } })
     }).catch(err => console.log('Cloud sync upload error:', err));
 
-    return top20;
+    return top30;
   } catch (err) {
     console.log('Error saving score:', err);
     return [];
@@ -349,21 +376,20 @@ async function renderLeaderboardContent() {
   renderLeaderboardRows(container, syncedList);
 }
 
-function renderLeaderboardRows(container, list) {
+function renderLeaderboardRows(container, rawList) {
+  const list = sortLeaderboardEntries(rawList);
+
   if (!list || list.length === 0) {
     container.innerHTML = `
       <div class="py-10 text-center space-y-3 font-mono">
         <div class="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto border border-indigo-500/30 text-2xl">
-          🛡️
+          🏆
         </div>
         <div>
-          <h4 class="text-sm font-bold text-white uppercase tracking-wider">Belum Ada Agen yang Menyelesaikan Misi</h4>
+          <h4 class="text-sm font-bold text-white uppercase tracking-wider">Belum Ada Sesi Permainan</h4>
           <p class="text-slate-400 text-xs mt-1 max-w-sm mx-auto font-sans leading-relaxed">
-            Papan peringkat bersih tanpa bot/data palsu. Siapapun yang mengakses dan menuntaskan 10 tahapan CTF akan otomatis tercatat di sini!
+            Selesaikan 10 tahapan permainan untuk mencatat skor kombinasi di sini.
           </p>
-        </div>
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mode Pengguna Asli Terverifikasi (Zero Bots)
         </div>
       </div>
     `;
@@ -371,63 +397,75 @@ function renderLeaderboardRows(container, list) {
   }
 
   container.innerHTML = `
-    <div class="space-y-2 font-mono">
-      <div class="flex items-center justify-between px-2 pb-1 border-b border-slate-800 text-[10px] text-slate-400">
-        <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Cloud Sync (Real Users)
+    <div class="space-y-2.5 font-mono">
+      <!-- Status Bar Kriteria Tunggal -->
+      <div class="flex items-center justify-between pb-1.5 border-b border-slate-800 text-[11px]">
+        <span class="flex items-center gap-1.5 text-cyan-400 font-bold">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          Kriteria: Skor Kombinasi (Akurasi + Waktu)
         </span>
-        <span>Total Pemain: ${list.length}</span>
+        <div class="flex items-center gap-2 text-[10px] text-slate-400">
+          <span class="flex items-center gap-1 text-emerald-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Live Sync
+          </span>
+          <span>•</span>
+          <span>${list.length} Pemain</span>
+        </div>
       </div>
 
-      <div class="grid grid-cols-12 text-[10px] text-slate-500 font-bold px-3 py-1 border-b border-slate-800">
+      <!-- Table Header (5 Kolom) -->
+      <div class="grid grid-cols-12 text-[10px] text-slate-400 font-bold px-3 py-1.5 border-b border-slate-800 select-none">
         <span class="col-span-2">POS</span>
-        <span class="col-span-4">AGEN ASLI</span>
+        <span class="col-span-4">PEMAIN</span>
         <span class="col-span-2 text-center">AKURASI</span>
         <span class="col-span-2 text-center">WAKTU</span>
         <span class="col-span-2 text-right">TOTAL</span>
       </div>
 
-      ${list.map((item, idx) => {
-        const rankNum = idx + 1;
-        let badge = `#${rankNum}`;
-        let rowBg = 'bg-slate-900/60 border-slate-800/80';
-        let rankColor = 'text-slate-400 font-bold';
+      <!-- Table Rows -->
+      <div class="space-y-1.5 max-h-[50vh] overflow-y-auto pr-0.5">
+        ${list.map((item, idx) => {
+          const rankNum = idx + 1;
+          let badge = `#${rankNum}`;
+          let rowBg = 'bg-slate-900/60 border-slate-800/80';
+          let rankColor = 'text-slate-400 font-bold';
 
-        if (rankNum === 1) {
-          badge = '🥇 #1';
-          rowBg = 'bg-amber-500/10 border-amber-500/40 shadow-sm';
-          rankColor = 'text-amber-400 font-extrabold';
-        } else if (rankNum === 2) {
-          badge = '🥈 #2';
-          rowBg = 'bg-slate-300/10 border-slate-300/40';
-          rankColor = 'text-slate-200 font-extrabold';
-        } else if (rankNum === 3) {
-          badge = '🥉 #3';
-          rowBg = 'bg-orange-500/10 border-orange-500/40';
-          rankColor = 'text-orange-300 font-extrabold';
-        }
+          if (rankNum === 1) {
+            badge = '🥇 #1';
+            rowBg = 'bg-amber-500/10 border-amber-500/40 shadow-sm';
+            rankColor = 'text-amber-400 font-extrabold';
+          } else if (rankNum === 2) {
+            badge = '🥈 #2';
+            rowBg = 'bg-slate-300/10 border-slate-300/40';
+            rankColor = 'text-slate-200 font-extrabold';
+          } else if (rankNum === 3) {
+            badge = '🥉 #3';
+            rowBg = 'bg-orange-500/10 border-orange-500/40';
+            rankColor = 'text-orange-300 font-extrabold';
+          }
 
-        const isCurrent = ctfGame.playerName && (item.name === ctfGame.playerName || item.token === ctfGame.agentToken);
-        if (isCurrent) {
-          rowBg += ' ring-2 ring-cyan-400';
-        }
+          const isCurrent = ctfGame.playerName && (item.name === ctfGame.playerName || item.token === ctfGame.agentToken);
+          if (isCurrent) {
+            rowBg += ' ring-2 ring-cyan-400';
+          }
 
-        return `
-          <div class="grid grid-cols-12 items-center px-3 py-2.5 rounded-xl border ${rowBg} text-xs transition hover:border-indigo-500/50">
-            <div class="col-span-2 ${rankColor}">${badge}</div>
-            <div class="col-span-4 truncate font-bold text-white flex flex-col">
-              <span class="truncate flex items-center gap-1.5">
-                ${item.name}
-                <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[8px] font-bold border border-emerald-500/40">USER</span>
-              </span>
-              <span class="text-[9px] text-slate-500 font-mono">${item.device || 'User'} • ${item.token || ''} • ${item.date || ''}</span>
+          const itemAcc = typeof item.accuracy === 'number' ? item.accuracy : (typeof item.score === 'number' ? item.score : 0);
+          const itemFinalScore = item.combinedScore || calculateCombinedScore(item);
+
+          return `
+            <div class="grid grid-cols-12 items-center px-3 py-2 rounded-xl border ${rowBg} text-xs transition hover:border-indigo-500/50">
+              <div class="col-span-2 ${rankColor}">${badge}</div>
+              <div class="col-span-4 truncate font-bold text-white flex flex-col">
+                <span class="truncate">${item.name}</span>
+                <span class="text-[9px] text-slate-500 font-mono">${item.device || 'Web'} • ${item.date || ''}</span>
+              </div>
+              <div class="col-span-2 text-center text-emerald-400 font-bold">${itemAcc}/100</div>
+              <div class="col-span-2 text-center text-amber-300 font-mono text-[11px] font-bold">${item.timeStr || '--:--'}</div>
+              <div class="col-span-2 text-right font-black text-cyan-400 text-xs sm:text-sm">${itemFinalScore}</div>
             </div>
-            <div class="col-span-2 text-center text-emerald-400 font-bold">${item.accuracy} Pts</div>
-            <div class="col-span-2 text-center text-amber-300 font-mono text-[11px]">${item.timeStr}</div>
-            <div class="col-span-2 text-right font-black text-cyan-400 text-sm">${item.totalScore}</div>
-          </div>
-        `;
-      }).join('')}
+          `;
+        }).join('')}
+      </div>
     </div>
   `;
 }
@@ -551,11 +589,11 @@ function renderPreMissionBriefing() {
       <!-- Agent Call Sign Input Card -->
       <div class="p-3.5 sm:p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5 sm:space-y-3 text-left shadow-inner">
         <label class="text-xs font-bold text-slate-300 flex items-center justify-between">
-          <span>CALL SIGN / NAMA AGEN ASLI:</span>
+          <span>NAMA PEMAIN:</span>
           <span class="text-cyan-400 text-[11px] font-mono">TOKEN: ${ctfGame.agentToken}</span>
         </label>
         <div class="flex gap-2">
-          <input type="text" id="inputAgentName" value="${ctfGame.playerName}" maxlength="18" placeholder="Ketik nama asli / panggilan..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-cyan-400" />
+          <input type="text" id="inputAgentName" value="${ctfGame.playerName}" maxlength="18" placeholder="Ketik nama Anda..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-cyan-400" />
           <button onclick="randomizeAgentName()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer" title="Acak Nama">
             🎲 Acak
           </button>
@@ -1601,8 +1639,8 @@ function showFinalScoreboard() {
 
   const accuracyScore = ctfGame.score; // 0 - 100
   const elapsed = Math.round(ctfGame.elapsedSeconds);
-  const timeBonus = Math.max(0, Math.round((240 - elapsed) * 2));
-  const totalScore = accuracyScore + timeBonus;
+  const timeBonus = Math.max(0, Math.round(240 - elapsed));
+  const totalScore = (accuracyScore * 10) + timeBonus;
 
   // Save to leaderboard
   const today = new Date();
@@ -1610,11 +1648,13 @@ function showFinalScoreboard() {
   saveScoreToLeaderboard({
     name: ctfGame.playerName,
     token: ctfGame.agentToken,
+    score: accuracyScore,
     accuracy: accuracyScore,
     timeStr: ctfGame.timerDisplayStr,
     timeSec: elapsed,
+    timeBonus: timeBonus,
     totalScore: totalScore,
-    device: /Mobi|Android/i.test(navigator.userAgent) ? 'HP / Mobile' : 'PC / Laptop',
+    device: /Mobi|Android/i.test(navigator.userAgent) ? 'HP' : 'PC',
     date: dateStr,
     timestamp: Date.now()
   });
@@ -1650,22 +1690,25 @@ function showFinalScoreboard() {
       <!-- Combined Score Box -->
       <div class="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3 shadow-inner">
         <div class="flex justify-between items-center text-xs text-slate-500 border-b border-slate-900 pb-2">
-          <span>AGEN ASLI: <strong class="text-white">${ctfGame.playerName}</strong> (${ctfGame.agentToken})</span>
+          <span>PEMAIN: <strong class="text-white">${ctfGame.playerName}</strong></span>
           <span class="text-amber-400 font-mono font-bold">⏱️ ${ctfGame.timerDisplayStr}</span>
         </div>
 
         <div class="grid grid-cols-3 gap-2 py-1">
           <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-            <span class="text-[10px] text-slate-500 block">AKURASI</span>
+            <span class="text-[10px] text-slate-500 block">AKURASI MATERI</span>
             <span class="text-lg sm:text-xl font-bold text-emerald-400">${accuracyScore} / 100</span>
+            <span class="text-[9px] text-slate-500 block">+${accuracyScore * 10} Poin</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-            <span class="text-[10px] text-slate-500 block">BONUS WAKTU</span>
+            <span class="text-[10px] text-slate-500 block">BONUS KECEPATAN</span>
             <span class="text-lg sm:text-xl font-bold text-amber-400">+${timeBonus}</span>
+            <span class="text-[9px] text-slate-500 block">Waktu: ${ctfGame.timerDisplayStr}</span>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-            <span class="text-[10px] text-slate-500 block">TOTAL SKOR</span>
+            <span class="text-[10px] text-cyan-400 font-bold block">TOTAL SKOR</span>
             <span class="text-lg sm:text-xl font-black ${scoreColor}">${totalScore}</span>
+            <span class="text-[9px] text-slate-500 block">Kriteria Tunggal</span>
           </div>
         </div>
       </div>
