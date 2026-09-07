@@ -533,53 +533,53 @@ function renderPreMissionBriefing() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="py-4 space-y-5 max-w-xl mx-auto font-mono text-center select-none">
-      <div class="w-16 h-16 rounded-3xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center mx-auto shadow-xl shadow-cyan-500/20 glow-pulse">
-        <i data-lucide="shield" class="w-8 h-8"></i>
+    <div class="py-2 sm:py-4 space-y-3.5 sm:space-y-5 max-w-xl mx-auto font-mono text-center w-full min-w-0">
+      <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center justify-center mx-auto shadow-xl shadow-cyan-500/20 glow-pulse">
+        <i data-lucide="shield" class="w-6 h-6 sm:w-8 sm:h-8"></i>
       </div>
 
       <div>
-        <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-xs font-bold uppercase tracking-widest">
+        <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 text-[10px] sm:text-xs font-bold uppercase tracking-widest">
           OPERATION PACKET DEFENDER
         </span>
-        <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">KomDat Cyber CTF: 10 Tahapan</h2>
-        <p class="text-slate-400 text-xs mt-1.5 font-sans leading-relaxed">
+        <h2 class="text-xl sm:text-3xl font-black text-white mt-1.5 sm:mt-2">KomDat Cyber CTF: 10 Tahapan</h2>
+        <p class="text-slate-400 text-xs mt-1 font-sans leading-relaxed px-1">
           Uji pemahaman komprehensif sistem komunikasi data melalui 10 tahapan taktil interaktif (100% puzzle operasional, tanpa soal pilihan ganda).
         </p>
       </div>
 
       <!-- Agent Call Sign Input Card -->
-      <div class="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3 text-left shadow-inner">
+      <div class="p-3.5 sm:p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5 sm:space-y-3 text-left shadow-inner">
         <label class="text-xs font-bold text-slate-300 flex items-center justify-between">
           <span>CALL SIGN / NAMA AGEN ASLI:</span>
           <span class="text-cyan-400 text-[11px] font-mono">TOKEN: ${ctfGame.agentToken}</span>
         </label>
         <div class="flex gap-2">
-          <input type="text" id="inputAgentName" value="${ctfGame.playerName}" maxlength="18" placeholder="Ketik nama asli / panggilan..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white text-sm font-bold focus:outline-none focus:border-cyan-400" />
-          <button onclick="randomizeAgentName()" class="px-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer" title="Acak Nama">
+          <input type="text" id="inputAgentName" value="${ctfGame.playerName}" maxlength="18" placeholder="Ketik nama asli / panggilan..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs sm:text-sm font-bold focus:outline-none focus:border-cyan-400" />
+          <button onclick="randomizeAgentName()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-bold transition cursor-pointer" title="Acak Nama">
             🎲 Acak
           </button>
         </div>
       </div>
 
       <!-- Operational Mission Rules -->
-      <div class="grid grid-cols-3 gap-2 text-left text-[11px]">
-        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-          <div class="text-emerald-400 font-bold">10 STAGES</div>
-          <div class="text-slate-400 text-[10px] mt-0.5">Komponen & Karakteristik Komdat</div>
+      <div class="grid grid-cols-3 gap-1.5 sm:gap-2 text-left text-[11px]">
+        <div class="p-2 sm:p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+          <div class="text-emerald-400 font-bold text-[10px] sm:text-xs">10 STAGES</div>
+          <div class="text-slate-400 text-[8px] sm:text-[10px] mt-0.5">Komponen & Karakteristik</div>
         </div>
-        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-          <div class="text-amber-400 font-bold">1x ATTEMPT</div>
-          <div class="text-slate-400 text-[10px] mt-0.5">Anti-Spam & Anti Trial-Error</div>
+        <div class="p-2 sm:p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+          <div class="text-amber-400 font-bold text-[10px] sm:text-xs">1x ATTEMPT</div>
+          <div class="text-slate-400 text-[8px] sm:text-[10px] mt-0.5">Anti-Spam & Anti-Cheat</div>
         </div>
-        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-          <div class="text-cyan-400 font-bold">LIVE TIMER</div>
-          <div class="text-slate-400 text-[10px] mt-0.5">Skor Akurasi + Waktu Cepat</div>
+        <div class="p-2 sm:p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+          <div class="text-cyan-400 font-bold text-[10px] sm:text-xs">LIVE TIMER</div>
+          <div class="text-slate-400 text-[8px] sm:text-[10px] mt-0.5">Akurasi + Kecepatan</div>
         </div>
       </div>
 
       <!-- Solid Cyber Start Button (No Gradient) -->
-      <div class="pt-2">
+      <div class="pt-2 pb-4">
         <button onclick="startMissionFromBriefing()" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 border border-emerald-400/50 text-white font-mono font-bold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg shadow-emerald-950/60 cursor-pointer flex items-center justify-center gap-2.5 mx-auto active:scale-95">
           <i data-lucide="play" class="w-4 h-4 fill-white"></i> MULAI OPERASI CYBER CTF SEKARANG
         </button>
@@ -615,7 +615,7 @@ function renderStage1() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40 uppercase">
@@ -702,7 +702,7 @@ function renderStage2() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/40 uppercase">
@@ -833,7 +833,7 @@ function renderStage3() {
   const scn = ctfGame.s3CurrentScenario;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/40 uppercase">
@@ -922,7 +922,7 @@ function renderStage4() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/40 uppercase">
@@ -1004,7 +1004,7 @@ function renderStage5() {
   const snr = Math.max(5, Math.round(40 - (diff / 180) * 35));
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40 uppercase">
@@ -1118,7 +1118,7 @@ function renderStage6() {
   const remaining = ctfGame.s6Spikes.filter(s => !s.cleared).length;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/40 uppercase">
@@ -1253,7 +1253,7 @@ function renderStage7() {
   const currentCase = ctfGame.s7Cases[ctfGame.s7CurrentCaseIdx];
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/40 uppercase">
@@ -1336,7 +1336,7 @@ function renderStage8() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/40 uppercase">
@@ -1435,7 +1435,7 @@ function renderStage9() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/40 uppercase">
@@ -1532,7 +1532,7 @@ function renderStage10() {
   if (!container) return;
 
   container.innerHTML = `
-    <div class="space-y-4 font-mono select-none">
+    <div class="space-y-4 font-mono w-full min-w-0">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-3 gap-2">
         <div>
           <span class="px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-500/40 uppercase">
@@ -1634,7 +1634,7 @@ function showFinalScoreboard() {
   }
 
   container.innerHTML = `
-    <div class="py-4 space-y-4 max-w-2xl mx-auto font-mono text-center select-none">
+    <div class="py-4 space-y-4 max-w-2xl mx-auto font-mono text-center w-full min-w-0">
       <div class="w-14 h-14 bg-cyan-500/10 text-cyan-400 rounded-2xl flex items-center justify-center mx-auto border border-cyan-500/30 shadow-lg shadow-cyan-500/10">
         <i data-lucide="award" class="w-8 h-8"></i>
       </div>
