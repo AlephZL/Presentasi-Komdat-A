@@ -37,26 +37,44 @@ body {
   display: none;
   opacity: 0;
   width: 100%;
-  will-change: transform, opacity, filter;
+  will-change: opacity, transform;
 }
 .slide.active {
   display: flex;
   opacity: 1;
 }
 
-/* Smooth Cinematic Slide Entrance (Fast, Crisp & Fluid) */
-.slide.active {
-  animation: slideCinematicFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Silky Smooth Slide Opacity Dissolve Transitions */
+.slide.active.slide-enter {
+  display: flex !important;
+  animation: slideSmoothFadeIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes slideCinematicFade {
+.slide.slide-exit {
+  display: flex !important;
+  animation: slideSmoothFadeOut 0.20s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes slideSmoothFadeIn {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.99);
+    transform: translateY(4px) scale(0.995);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideSmoothFadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.995);
   }
 }
 

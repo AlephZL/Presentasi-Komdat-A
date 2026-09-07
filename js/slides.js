@@ -27,8 +27,9 @@ function checkDirectGameLink() {
 }
 checkDirectGameLink();
 window.addEventListener('hashchange', () => {
-  checkDirectGameLink();
-  updateSlideUI();
+  if (checkDirectGameLink()) {
+    goToSlide(5);
+  }
 });
 
 // ==========================================
@@ -54,21 +55,9 @@ function renderDots() {
 }
 
 // ==========================================
-// UPDATE SLIDE UI & CINEMATIC TRANSITION
+// NAVIGATION UI & COMPONENT HOOKS
 // ==========================================
-function updateSlideUI() {
-  window.scrollTo({ top: 0, behavior: 'instant' });
-
-  slides.forEach((s, idx) => {
-    if (idx === currentSlide) {
-      s.classList.remove('active');
-      void s.offsetWidth; // Trigger reflow for smooth animation restart
-      s.classList.add('active');
-    } else {
-      s.classList.remove('active');
-    }
-  });
-
+function updateNavUI() {
   const indicator = document.getElementById('slideIndicator');
   if (indicator) {
     indicator.innerText = `Slide 0${currentSlide + 1} / 0${slides.length}`;
@@ -83,10 +72,28 @@ function updateSlideUI() {
   }
   
   renderDots();
-  if (window.lucide) window.lucide.createIcons();
 
+  const btnPrev = document.getElementById('btnPrevSlide');
+  const btnNext = document.getElementById('btnNextSlide');
+  if (btnPrev) {
+    const isFirst = currentSlide === 0;
+    btnPrev.disabled = isFirst;
+    btnPrev.classList.toggle('opacity-30', isFirst);
+    btnPrev.classList.toggle('pointer-events-none', isFirst);
+  }
+  if (btnNext) {
+    const isLast = currentSlide === slides.length - 1;
+    btnNext.disabled = isLast;
+    btnNext.classList.toggle('opacity-30', isLast);
+    btnNext.classList.toggle('pointer-events-none', isLast);
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function triggerSlideHooks(slideIdx) {
   // Trigger 3D Inspector resize when entering Slide 2 (index 1)
-  if (currentSlide === 1 && typeof resizeComponentCanvas === 'function' && typeof inspectComponent === 'function') {
+  if (slideIdx === 1 && typeof resizeComponentCanvas === 'function' && typeof inspectComponent === 'function') {
     setTimeout(() => {
       resizeComponentCanvas();
       inspectComponent(currentCompIdx);
@@ -94,31 +101,103 @@ function updateSlideUI() {
   }
 
   // Trigger Oscilloscope animation on Slide 5 (index 4)
-  if (currentSlide === 4 && typeof drawOscilloscopeWaveform === 'function') {
+  if (slideIdx === 4) {
     setTimeout(() => {
-      drawOscilloscopeWaveform();
+      if (typeof setupOscilloscopeControls === 'function') {
+        setupOscilloscopeControls();
+      }
+      if (typeof drawOscilloscopeWaveform === 'function') {
+        drawOscilloscopeWaveform();
+      }
     }, 60);
+  }
+}
+
+// ==========================================
+// SILKY SMOOTH OPACITY SLIDE ENGINE
+// ==========================================
+let isSlideTransitioning = false;
+let slideTransitionTimer = null;
+
+// Direct immediate render without transition (for initial load / recovery)
+function updateSlideUI() {
+  if (slideTransitionTimer) {
+    clearTimeout(slideTransitionTimer);
+    slideTransitionTimer = null;
+  }
+  isSlideTransitioning = false;
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
+
+  slides.forEach((s, idx) => {
+    s.classList.remove('slide-enter', 'slide-exit');
+    if (idx === currentSlide) {
+      s.classList.add('active');
+    } else {
+      s.classList.remove('active');
+    }
+  });
+
+  updateNavUI();
+  triggerSlideHooks(currentSlide);
+}
+
+// Silky Smooth Opacity Dissolve Transition
+function goToSlide(targetIdx) {
+  if (targetIdx < 0 || targetIdx >= slides.length || targetIdx === currentSlide) return;
+
+  // Clear any existing transition timers
+  if (slideTransitionTimer) {
+    clearTimeout(slideTransitionTimer);
+    slideTransitionTimer = null;
+    slides.forEach((s, idx) => {
+      if (idx !== currentSlide && idx !== targetIdx) {
+        s.classList.remove('active', 'slide-enter', 'slide-exit');
+      }
+    });
+  }
+
+  const currentSlideElem = document.querySelector('.slide.active');
+  const targetSlideElem = slides[targetIdx];
+  currentSlide = targetIdx;
+
+  // Update indicators immediately for responsive tactile feedback
+  updateNavUI();
+
+  if (currentSlideElem && currentSlideElem !== targetSlideElem) {
+    isSlideTransitioning = true;
+    currentSlideElem.classList.remove('slide-enter');
+    currentSlideElem.classList.add('slide-exit');
+
+    slideTransitionTimer = setTimeout(() => {
+      currentSlideElem.classList.remove('active', 'slide-exit');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+
+      targetSlideElem.classList.remove('slide-exit');
+      targetSlideElem.classList.add('active', 'slide-enter');
+      triggerSlideHooks(currentSlide);
+
+      slideTransitionTimer = setTimeout(() => {
+        targetSlideElem.classList.remove('slide-enter');
+        isSlideTransitioning = false;
+        slideTransitionTimer = null;
+      }, 340);
+    }, 200);
+  } else {
+    updateSlideUI();
   }
 }
 
 function nextSlide() {
   if (currentSlide < slides.length - 1) {
-    currentSlide++;
-    updateSlideUI();
+    goToSlide(currentSlide + 1);
   }
 }
 
 function prevSlide() {
   if (currentSlide > 0) {
-    currentSlide--;
-    updateSlideUI();
+    goToSlide(currentSlide - 1);
   }
-}
-
-function goToSlide(idx) {
-  if (idx === currentSlide) return;
-  currentSlide = idx;
-  updateSlideUI();
 }
 
 window.addEventListener('keydown', (e) => {
